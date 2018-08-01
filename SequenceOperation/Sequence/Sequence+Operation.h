@@ -15,6 +15,7 @@ typedef id _Nullable (^MapBlock)(T _Nonnull obj);
 typedef id _Nullable (^FlatMapBlock)(T _Nonnull obj);
 typedef id _Nullable (^CompactMapBlock)(T _Nonnull obj);
 typedef BOOL (^PredictBlock)(T _Nonnull obj);
+typedef id (^ReduceBlock)(id value, T _Nonnull obj);
 
 - (void)forEach:(void(^)(T _Nonnull obj))block;
 - (void)forEachWithIndex:(void(^)(NSInteger index, T _Nonnull obj))block;
@@ -26,8 +27,11 @@ typedef BOOL (^PredictBlock)(T _Nonnull obj);
 - (Sequence*)contact:(id<NSFastEnumeration>)otherSequence;
 - (T)firstObjectWhere:(PredictBlock)predict;
 - (NSInteger)firstIndexWhere:(PredictBlock)predict;
-- (Sequence *)take:(NSInteger)count;
-- (Sequence *)skip:(NSInteger)count;
+- (Sequence *)take:(NSUInteger)count;
+- (Sequence *)skip:(NSUInteger)count;
+- (id)reduceWithStartValue:(id)startValue reduceBlock:(ReduceBlock)block;
+- (id)reduce:(ReduceBlock)block;
+- (BOOL)any:(PredictBlock)block;
 - (Sequence *)zip:(id<NSFastEnumeration>)otherSequence;
 
 @end

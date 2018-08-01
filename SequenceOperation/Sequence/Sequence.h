@@ -14,5 +14,10 @@
 
 - (instancetype)initWithCollection:(id<NSFastEnumeration>)collection;
 
+- (id)as:(Class)class;
+
+- (NSArray<T> *)asArray;
+
+- (T)firstObject;
 
 @end

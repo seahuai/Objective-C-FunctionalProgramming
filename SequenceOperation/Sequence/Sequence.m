@@ -21,6 +21,21 @@
     return self;
 }
 
+- (id)as:(Class)class {
+    if ([(id)self.collection isMemberOfClass:class]) {
+        return self.collection;
+    }
+    if (class == [NSArray class] && [(id)self.collection isKindOfClass:class]) {
+        return [(id)self.collection copy];
+    }
+    //todo
+    return nil;
+}
+
+- (NSArray *)asArray {
+    return [self as:[NSArray class]];
+}
+
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id  _Nullable __unsafe_unretained [])buffer count:(NSUInteger)len {
     return [self.collection countByEnumeratingWithState:state objects:buffer count:len];
 }
@@ -31,6 +46,22 @@
     }else {
         return nil; // 自定义enumerator
     }
+}
+
+- (BOOL)containObject:(id)object {
+    for (id obj in self) {
+        if ([obj isEqual:object]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+- (id)firstObject {
+    for (id obj in self) {
+        return obj;
+    }
+    return nil;
 }
 
 

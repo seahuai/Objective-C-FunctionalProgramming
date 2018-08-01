@@ -113,12 +113,58 @@
     return index;
 }
 
+- (Sequence *)take:(NSUInteger)count {
+    NSMutableArray *result = [NSMutableArray array];
+    NSInteger index = 0;
+    for (id obj in self) {
+        if (index >= count) { break; }
+        [result addObject:obj];
+        index += 1;
+    }
+    return InitSequence(result);
+}
+
+- (Sequence *)skip:(NSUInteger)count {
+    NSMutableArray *result = [NSMutableArray array];
+    NSInteger index = 0;
+    for (id obj in self) {
+        index += 1;
+        if (index <= count) { continue; }
+        [result addObject:obj];
+    }
+    return InitSequence(result);
+}
+
+- (id)reduceWithStartValue:(id)startValue reduceBlock:(ReduceBlock)block {
+    if (!block || !startValue) { return nil; }
+    id result = startValue;
+    for (id obj in self) {
+        result = block(result, obj);
+    }
+    return result;
+}
+
+- (id)reduce:(ReduceBlock)block {
+    if (!block) { return nil; }
+    id startValue = self.firstObject;
+    return [[self skip:1] reduceWithStartValue:startValue reduceBlock:block];
+}
+
+- (BOOL)any:(PredictBlock)block {
+    if (!block) { return false; }
+    for (id obj in self) {
+        if (block(obj)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 - (Sequence *)zip:(id<NSFastEnumeration>)otherSequence {
     NSMutableArray *result = [NSMutableArray array];
     Sequence *tmp1 = [self flat];
-    Sequence *tmp2 = InitSequence(otherSequence);
+    Sequence *tmp2 = [[[Sequence alloc] initWithCollection:otherSequence] flat];
     NSArray<NSEnumerator*> *_sequences = @[tmp1.objectEnumerator, tmp2.objectEnumerator];
-//    Sequence<NSEnumerator*> *sequences =
     NSObject *breaker = [NSObject new];
     while (1) {
         NSMutableArray *values = [NSMutableArray arrayWithCapacity:2];
@@ -133,29 +179,6 @@
     }
     return InitSequence(result);
 }
-
-- (Sequence *)take:(NSInteger)count {
-    NSMutableArray *result = [NSMutableArray array];
-    NSInteger index = 0;
-    for (id obj in self) {
-        if (index >= count) { break; }
-        [result addObject:obj];
-        index += 1;
-    }
-    return InitSequence(result);
-}
-
-- (Sequence *)skip:(NSInteger)count {
-    NSMutableArray *result = [NSMutableArray array];
-    NSInteger index = 0;
-    for (id obj in self) {
-        if (index < count) { continue; }
-        [result addObject:obj];
-        index += 1;
-    }
-    return InitSequence(result);
-}
-
 
 
 
